@@ -24,4 +24,4 @@ fi
 msg=$(echo "$status" | jq --slurp --raw-input '"<pre>" + . + "</pre>" | { "title": "'"$title"'", "text": . }')
 
 # Send to Teams
-echo wget --header="Content-Type: application/json" --post-data="${msg}" "${webhook_url}" # >/dev/null
+wget -O /dev/null --header="Content-Type: application/json" --post-data="${msg}" "${webhook_url}"
