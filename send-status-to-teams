@@ -1,0 +1,27 @@
+#!/bin/bash
+set -u
+set -eo pipefail
+
+unit=$1
+# Use second parameter when present, or fallback to environment variable
+webhook_url=${2:-$WEBHOOK_URL}
+
+# Get information to send from SystemD
+# systemctl exits with non-zero status when the unit has failed, so ignore its exit code
+set +e
+status=$(systemctl status --full "$unit")
+set -e
+
+# What title should we use?
+if systemctl is-failed --quiet "$unit"
+then
+    title="Error in $unit"
+else
+    title="Status of $unit"
+fi
+
+# Convert text to JSON accepted by Microsoft Teams
+msg=$(echo "$status" | jq --slurp --raw-input '"<pre>" + . + "</pre>" | { "title": "'"$title"'", "text": . }')
+
+# Send to Teams
+echo wget --header="Content-Type: application/json" --post-data="${msg}" "${webhook_url}" # >/dev/null

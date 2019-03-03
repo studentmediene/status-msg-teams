@@ -1,0 +1,10 @@
+[Unit]
+Description=status message of %i to Microsoft Teams
+
+[Service]
+Type=oneshot
+# Replace <URL> with webhook URL from Microsoft Teams
+Environment=WEBHOOK_URL=<URL>
+ExecStart=/usr/local/bin/send-status-to-teams %i
+User=nobody
+Group=systemd-journal
